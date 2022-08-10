@@ -1,0 +1,11 @@
+# hexo robots.txt
+User-agent: *
+Allow: /
+Allow: /archives/
+
+Disallow: /vendors/
+Disallow: /js/
+Disallow: /css/
+
+Sitemap: http://jefferyfan.github.io/sitemap.xml
+Sitemap: http://jefferyfan.github.io/baidusitemap.xml

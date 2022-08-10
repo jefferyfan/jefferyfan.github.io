@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jefferyfan.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这篇文章是对英文文章「Best practices in Android development」的翻译。文章主要为一些Android开发的建议，涉及项目目录结构，IDE，测试框架等内容。这些建议都是Futurice公司安卓开发者实践得出的结论，很有借鉴意义。当然，你可以选择不理会这篇文章提出的建议，只要你觉得你现在的开发习惯更适合你自己，更加有效率。 本文发布于伯乐在线最佳实践之一：安卓开发篇，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android开发之最佳实践">
+<meta property="og:url" content="https://jefferyfan.github.io/2015/01/31/translation/BestPraticeOfAndroidDev/index.html">
+<meta property="og:site_name" content="Jeffery&#39;s Blog">
+<meta property="og:description" content="这篇文章是对英文文章「Best practices in Android development」的翻译。文章主要为一些Android开发的建议，涉及项目目录结构，IDE，测试框架等内容。这些建议都是Futurice公司安卓开发者实践得出的结论，很有借鉴意义。当然，你可以选择不理会这篇文章提出的建议，只要你觉得你现在的开发习惯更适合你自己，更加有效率。 本文发布于伯乐在线最佳实践之一：安卓开发篇，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2015-01-31T10:54:32.000Z">
+<meta property="article:modified_time" content="2022-08-10T08:57:55.894Z">
+<meta property="article:author" content="Jeffery Fan">
+<meta property="article:tag" content="Android,">
+<meta property="article:tag" content="Guideline">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jefferyfan.github.io/2015/01/31/translation/BestPraticeOfAndroidDev/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Android开发之最佳实践 | Jeffery's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c6d56a4590a7e7d056f66c6777e57527";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Jeffery's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">为而不争</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jefferyfan.github.io/2015/01/31/translation/BestPraticeOfAndroidDev/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/portrait.jpg">
+      <meta itemprop="name" content="Jeffery Fan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jeffery's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android开发之最佳实践
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-01-31 18:54:32" itemprop="dateCreated datePublished" datetime="2015-01-31T18:54:32+08:00">2015-01-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Translation/" itemprop="url" rel="index"><span itemprop="name">Translation</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2015/01/31/translation/BestPraticeOfAndroidDev/" class="post-meta-item leancloud_visitors" data-flag-title="Android开发之最佳实践" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2015/01/31/translation/BestPraticeOfAndroidDev/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2015/01/31/translation/BestPraticeOfAndroidDev/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这篇文章是对英文文章「<a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices">Best practices in Android development</a>」的翻译。文章主要为一些Android开发的建议，涉及项目目录结构，IDE，测试框架等内容。这些建议都是Futurice公司安卓开发者实践得出的结论，很有借鉴意义。当然，你可以选择不理会这篇文章提出的建议，只要你觉得你现在的开发习惯更适合你自己，更加有效率。</p>
+<p>本文发布于伯乐在线<a target="_blank" rel="noopener" href="https://github.com/JefferyFan/android-best-practices/blob/master/www.futurice.com">最佳实践之一：安卓开发篇</a>，未经许可，禁止转载。感谢<a target="_blank" rel="noopener" href="http://android.jobbole.com/author/toolate/">toolate</a>的校稿。以下是译文。</p>
+<p>这篇文章主要为Futurice公司Android开发者总结的经验教训。遵循这些规范可以避免无谓的重复劳动。如果对iOS或Windows Phone平台的开发感兴趣，请查看<a target="_blank" rel="noopener" href="https://github.com/futurice/ios-good-practices">iOS最佳实践文档</a>和<a target="_blank" rel="noopener" href="https://github.com/futurice/win-client-dev-good-practices">Windows客户端最佳实践文档</a>。</p>
+<p>欢迎反馈，但请先阅读<a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices/blob/master/CONTRIBUTING.md">反馈规范</a>。</p>
+<span id="more"></span>
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>使用Gradle和Gradle默认的项目结构</li>
+<li>将密码和敏感数据放在gradle.properties</li>
+<li>不要实现自己的HTTP客户端，使用Volley或者OkHttp库</li>
+<li>使用Jackson库解析JSON数据</li>
+<li>由于65K的方法空间限制，避免使用Guava和使用较少的库</li>
+<li>用Fragment来显示UI</li>
+<li>Activity只用来管理Fragment</li>
+<li>XML也是代码，管理好XML代码</li>
+<li>使用样式来减少布局XML代码中重复属性</li>
+<li>将样式写在多个文件中，避免把样式全部写在单一的大文件当中</li>
+<li>保持colors.xml文件的简短干净，只定义调色板</li>
+<li>同样也保持dimens.xml简短干净，只定义通用的常量</li>
+<li>避免深层级的ViewGroup</li>
+<li>避免客户端处理WebView要显示的内容，并且注意内存泄露</li>
+<li>使用Robolectric进行单元测试，使用Robotium进行连接设备（UI）的测试</li>
+<li>使用Genymotion模拟器</li>
+<li>一直使用ProGuard或者DexGuard</li>
+</ul>
+<h2 id="Android-SDK"><a href="#Android-SDK" class="headerlink" title="Android SDK"></a>Android SDK</h2><p>将<a target="_blank" rel="noopener" href="https://developer.android.com/sdk/installing/index.html?pkg=tools">Android SDK</a>存放在home目录或者其他跟应用开发无关的位置。一些IDE在安装时包含了SDK，这时SDK可能存放在IDE的安装目录下。而这是很不好的做法，特别是当你需要升级（或者重新安装）IDE时，或者换一个IDE时。同时也要避免把SDK存放在系统目录下，否则，当普通用户（不是root）使用IDE时就需要获取sudo权限。</p>
+<h2 id="编译系统"><a href="#编译系统" class="headerlink" title="编译系统"></a>编译系统</h2><p>编译系统首选Gradle。相比于Gradle，Ant更加的局限并且更加繁琐。使用Gradle编译系统可以很简单的做到：</p>
+<ul>
+<li>将应用编译成不同的版本</li>
+<li>完成简单的类似脚本的任务</li>
+<li>管理和下载依赖</li>
+<li>自定义秘钥仓库</li>
+<li>其他…</li>
+</ul>
+<p>Google正积极的开发安卓Gradle插件，作为新的标准编译系统。</p>
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><p>主要有两个主流的项目结构：旧的Ant项目结构和Eclipse ADT项目结构，较新的Gradle和Android Studio项目结构。当然选择新的项目结构。如果你的项目正在用旧的项目结构，考虑放弃旧的结构，转移到新的项目结构下吧。</p>
+<p>旧项目结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">old-structure</span><br><span class="line">├─ assets</span><br><span class="line">├─ libs</span><br><span class="line">├─ res</span><br><span class="line">├─ src</span><br><span class="line">│  └─ com/futurice/project</span><br><span class="line">├─ AndroidManifest.xml</span><br><span class="line">├─ build.gradle</span><br><span class="line">├─ project.properties</span><br><span class="line">└─ proguard-rules.pro</span><br></pre></td></tr></table></figure>
+
+<p>新的项目结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">new-structure</span><br><span class="line">├─ library-foobar</span><br><span class="line">├─ app</span><br><span class="line">│  ├─ libs</span><br><span class="line">│  ├─ src</span><br><span class="line">│  │  ├─ androidTest</span><br><span class="line">│  │  │  └─ java</span><br><span class="line">│  │  │     └─ com/futurice/project</span><br><span class="line">│  │  └─ main</span><br><span class="line">│  │     ├─ java</span><br><span class="line">│  │     │  └─ com/futurice/project</span><br><span class="line">│  │     ├─ res</span><br><span class="line">│  │     └─ AndroidManifest.xml</span><br><span class="line">│  ├─ build.gradle</span><br><span class="line">│  └─ proguard-rules.pro</span><br><span class="line">├─ build.gradle</span><br><span class="line">└─ settings.gradle</span><br></pre></td></tr></table></figure>
+
+<p>新旧项目结构最大的不同点是新项目结构更加合理的分开了代码集（main, androidTest）。例如，你可以在代码集src文件夹下添加paid和free文件夹，分别用于存放付费版应用代码和免费版应用的代码。</p>
+<p>顶层app文件夹用于将你的应用和其他库（例如：library-foobar）区分开来。Settings.gradle中保存了app/build.gradle需要用到的库的引用。</p>
+<h2 id="Gradle配置"><a href="#Gradle配置" class="headerlink" title="Gradle配置"></a>Gradle配置</h2><p><strong>普通项目结构</strong>。遵循<a target="_blank" rel="noopener" href="http://fanyi.jobbole.com/1779/tools.android.com/tech-docs/new-build-system/user-guide">Google安卓Gradle规范</a>。<br><strong>简单任务</strong>。可以用Gradle完成一些简单任务，而不用特地去写（shell, Python, Perl等）脚本。具体参考Gradle文档。<br><strong>密码</strong>。你需要在build.gradle中配置应用发行版本的签名配置。以下这些情况是需要避免的：</p>
+<p>不要这样做。这些会出现在版本控制系统中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">signingConfigs &#123;</span><br><span class="line">    release &#123;</span><br><span class="line">        storeFile file(&quot;myapp.keystore&quot;)</span><br><span class="line">        storePassword &quot;password123&quot;</span><br><span class="line">        keyAlias &quot;thekey&quot;</span><br><span class="line">        keyPassword &quot;password789&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>换一种方式，新建一个gradle.properties文件，文件内容如下。注意，不要把Gradle.properties添加到版本控制系统中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">KEYSTORE_PASSWORD=password123</span><br><span class="line">KEY_PASSWORD=password789</span><br></pre></td></tr></table></figure>
+
+<p>Gradle会自动导入gradle.properties文件，所以你可以在build.gradle中这样写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">signingConfigs &#123;</span><br><span class="line">    release &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            storeFile file(&quot;myapp.keystore&quot;)</span><br><span class="line">            storePassword KEYSTORE_PASSWORD</span><br><span class="line">            keyAlias &quot;thekey&quot;</span><br><span class="line">            keyPassword KEY_PASSWORD</span><br><span class="line">        &#125;</span><br><span class="line">        catch (ex) &#123;</span><br><span class="line">            throw new InvalidUserDataException(&quot;You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用Maven管理项目依赖，而不是直接导入jar文件。如果你显式的导入jar文件到项目中，那这些依赖的jar文件只会是某个固定的版本，例如2.1.1。下载jar文件并及时更新jar是很笨的更新依赖的方式。Maven解决了这个问题，并且，Maven可以集成在安卓Gradle编译系统中。你可以指定版本的范围，例如2.2.+，然后Maven就会自动更新到版本范围内的最新版本。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile &#x27;com.netflix.rxjava:rxjava-core:0.19.+&#x27;</span><br><span class="line">    compile &#x27;com.netflix.rxjava:rxjava-android:0.19.+&#x27;</span><br><span class="line">    compile &#x27;com.fasterxml.jackson.core:jackson-databind:2.4.+&#x27;</span><br><span class="line">    compile &#x27;com.fasterxml.jackson.core:jackson-core:2.4.+&#x27;</span><br><span class="line">    compile &#x27;com.fasterxml.jackson.core:jackson-annotations:2.4.+&#x27;</span><br><span class="line">    compile &#x27;com.squareup.okhttp:okhttp:2.0.+&#x27;</span><br><span class="line">    compile &#x27;com.squareup.okhttp:okhttp-urlconnection:2.0.+&#x27;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="IDE和文本编辑器"><a href="#IDE和文本编辑器" class="headerlink" title="IDE和文本编辑器"></a>IDE和文本编辑器</h2><p>不管用什么编辑器，它都必须要能够很好的显示项目结构。编译器的选择看个人喜好，但是编辑器必须要能够显示项目结构和编译。</p>
+<p>现在最为推荐的IDE时<a target="_blank" rel="noopener" href="https://developer.android.com/sdk/installing/studio.html">Android Studio</a>，因为Android Studio由Google开发，最为接近Gradle，默认使用新的项目结构，也终于发布了beta版，可以说是为Android开发量身定做的IDE。</p>
+<p>当然你也可以使用<a target="_blank" rel="noopener" href="https://developer.android.com/sdk/installing/index.html?pkg=adt">Eclipse ADT</a>，但是需要重新配置，因为Ecplise ADT默认使用旧的项目结构和使用Ant编译。甚至，可以使用纯文本编辑器，比如Vim, Sublime Text, 或者Emacs。如果使用纯文本编辑器，就需要在命令行中使用Gradle和adb。如果Eclipse集成Gradle后仍旧不能工作，你可以选择在命令行中编译，或者迁移至Android Studio。</p>
+<p>不管使用什么IDE和文本编辑器，确保使用Gradle和新的项目结构来编译应用程序，同时避免把编译器的配置文件添加到版本控制系统当中。例如，避免添加Ant的配置文件build.xml。还有需要强调的一点，如果你在Ant中更改了编译配置，不要忘记更新build.gradle，使其能够完成编译。另外，对其他的开发者友好一点，不要强迫他们去改变他们的工具的偏好设置。</p>
+<h2 id="库"><a href="#库" class="headerlink" title="库"></a>库</h2><p><a target="_blank" rel="noopener" href="http://wiki.fasterxml.com/JacksonHome">Jackson</a>是一个用于将对象转换成JSON或者将JSON转换成对象的Java库。为了解决JSON和对象相互转换的问题，<a target="_blank" rel="noopener" href="https://code.google.com/p/google-gson/">Gson</a>是一个受欢迎的选择。但是我们发现，自从Jackson支持多种JSON处理方式：流，内存中的树模型和传统的JSON-POJO数据绑定，Jackson更加高效。请记住，Jackson是一个比GSON大的库，所以请根据你自己的实际情况做出选择。考虑到65K的方法空间限制，你可能会偏向于选择GSON。其他选择：<a target="_blank" rel="noopener" href="https://code.google.com/p/json-smart/">Json-smart</a>和<a target="_blank" rel="noopener" href="https://github.com/RichardHightower/boon/wiki/Boon-JSON-in-five-minutes">Boon JSON</a></p>
+<p><strong>网络，缓存和图片</strong>。现在已经有许多经过实践证明的向后端服务器请求数据的解决方案。你应该考虑使用这些解决方案来实现自己的客户端。使用<a target="_blank" rel="noopener" href="https://android.googlesource.com/platform/frameworks/volley">Volley</a>或者<a target="_blank" rel="noopener" href="http://square.github.io/retrofit/">Retrofit</a>。Volley也提供了加载和缓存图片的帮助类。如果你选择Retrofit，考虑使用<a target="_blank" rel="noopener" href="http://square.github.io/picasso/">Picasso</a>来加载和缓存图片，使用OkHttp来实现高效的HTTP请求。Retrofit，Picasso和OkHttp都由同一个公司实现，所以这三者契合的特别好。<a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/24375043/how-to-implement-android-volley-with-okhttp-2-0/24951835#24951835">OkHttp也可以和Volley配套使用</a>。</p>
+<p><strong>RxJava</strong>是一个用于响应式编程的库，也即是，处理异步事件的库。RxJava非常强大，<em>也是一个很好的范例（promising paradigm）</em>。RxJava非常与众不同，因此使用RxJava时可能会令人迷惑。我们推荐在把RxJava部署到整个应用前先花一些时间了解RxJava。现在已经有一些项目是利用RxJava来完成的，如果你需要帮助，请向这些人询问：Timo Tuominen, Olli Salonen, Andre Medeiros, Mark Voit, Antti Lammi, Vera Izrailit, Juha Ristolainen。另外，我们也写了一些博客：<a target="_blank" rel="noopener" href="http://blog.futurice.com/tech-pick-of-the-week-rx-for-net-and-rxjava-for-android"><a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices">1</a></a>, <a target="_blank" rel="noopener" href="http://blog.futurice.com/top-7-tips-for-rxjava-on-android"><a target="_blank" rel="noopener" href="https://github.com/futurice/ios-good-practices">2</a></a>, <a target="_blank" rel="noopener" href="https://gist.github.com/staltz/868e7e9bc2a7b8c1f754"><a target="_blank" rel="noopener" href="https://github.com/futurice/win-client-dev-good-practices">3</a></a>, <a target="_blank" rel="noopener" href="http://blog.futurice.com/android-development-has-its-own-swift"><a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices/blob/master/CONTRIBUTING.md">4</a></a>.</p>
+<p>如果你没有使用Rx的经验，请从应用Rx的响应API开始。或者，从应用Rx的UI事件处理开始，比如点击事件或者在搜索框中的键盘事件。如果你对使用Rx很有信心，想要把Rx应用到整个应用程序当中，请在比较难处理，容易令人迷惑的部分写明Javadocs。记住，其他不熟悉RxJava的程序员维护项目时可能会非常困难。请尽力去帮助他去理解你的代码和Rx。</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/evant/gradle-retrolambda">Retrolambda</a>*<em>是一个在Android平台或者其他低于JDK8的平台上处理Lambda表达式语法的Java库。利用这个库，可以保持你的代码的整洁严谨并且具有可读性，特别是当你使用了</em>函数式样式（functional style）*，例如使用了RxJava。使用前，先安装JDK8，在Android Studio项目结构对话框中将它设置为你的SDK路径，设置JAVA8_HOME和JAVA7_HOME环境变量，然后在项目根目录下build.gradle中增加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    classpath &#x27;me.tatarka:gradle-retrolambda:2.4.+&#x27;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在每一个模块下的build.gradle中，增加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &#x27;retrolambda&#x27;</span><br><span class="line"> </span><br><span class="line">android &#123;</span><br><span class="line">    compileOptions &#123;</span><br><span class="line">    sourceCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">    targetCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">retrolambda &#123;</span><br><span class="line">    jdk System.getenv(&quot;JAVA8_HOME&quot;)</span><br><span class="line">    oldJdk System.getenv(&quot;JAVA7_HOME&quot;)</span><br><span class="line">    javaVersion JavaVersion.VERSION_1_7</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Android Studio支持对Java8的lambda智能提示。如果你是第一次使用lambda，从以下两条规则开始：</p>
+<ul>
+<li>所有只有一个方法的接口都是「lambda友好」的，能够被转换成更加整洁严谨的语法。</li>
+<li>如果你不确定参数或者其他信息，写一个普通的匿名内部类，然后让Android Studio将它转换成一个lamdba表达式。</li>
+</ul>
+<p><strong>请注意dex方法限制，避免使用过多的库。</strong>被打包成dex文件的安卓应用，都有一个硬性的限制：最多能有65536个方法引用<a target="_blank" rel="noopener" href="https://medium.com/@rotxed/dex-skys-the-limit-no-65k-methods-is-28e6cb40cf71"><a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices">1</a></a> <a target="_blank" rel="noopener" href="http://blog.persistent.info/2014/05/per-package-method-counts-for-androids.html"><a target="_blank" rel="noopener" href="https://github.com/futurice/ios-good-practices">2</a></a> <a target="_blank" rel="noopener" href="http://jakewharton.com/play-services-is-a-monolith/"><a target="_blank" rel="noopener" href="https://github.com/futurice/win-client-dev-good-practices">3</a></a>。如果你超出了这个限制，在编译的时候你就会看到一个严重的编译错误。因此，使用尽量少的库，并使用<a target="_blank" rel="noopener" href="https://github.com/mihaip/dex-method-counts">dex-method-counts</a>工具来决定在保证不超出限制的前提下，有哪些库可以使用。特别要避免使用Guava库，因为它包含了超过13k个方法。</p>
+<h2 id="Activities-and-Fragments"><a href="#Activities-and-Fragments" class="headerlink" title="Activities and Fragments"></a>Activities and Fragments</h2><p>在Android应用开发中，首选<a target="_blank" rel="noopener" href="http://developer.android.com/guide/components/fragments.html">Fragment</a>来显示UI。Fragment是可重用的用户交互界面，并且可以将Fragment组合在一起。我们推荐使用Fragment来显示用户交互界面，而不是使用<a target="_blank" rel="noopener" href="http://developer.android.com/guide/components/activities.html">Activity</a>。以下是一些理由：</p>
+<ul>
+<li><strong>实现多视图布局。</strong>将手机应用扩展至平板的主要方法便是利用Fragment。利用Fragment，可以让视图A和B都显示在一个平板屏幕上，而在手机屏幕上，视图A和B都占一整块屏幕。如果你的应用从一开始就用Frament来实现，那么你很容易就能将你的应用适配到屏幕大小不同的设备上。</li>
+<li><strong>屏与屏之间的通信。</strong>安卓API并没有提供一个恰当的方法将复杂的数据（例如，一些Java对象）从一个Activity发送到另外一个Activity中。但是利用Fragment时，以activity实例为通信管道，可以实现该activity下的子fragment之间的通信。即使这种方法优于Activity之间的通信，你可能仍旧需要一个事件总线的架构，考虑使用<a target="_blank" rel="noopener" href="https://square.github.io/otto/">Otto</a>或者<a target="_blank" rel="noopener" href="https://github.com/greenrobot/EventBus">greenrobot EventBus</a>。</li>
+<li><strong>Fragment有更好的普适性，而不仅仅只是实现UI。</strong>你可以实现一个<a target="_blank" rel="noopener" href="http://developer.android.com/guide/components/fragments.html#AddingWithoutUI">没有UI的fragment</a>，作为activity后台运行的「工人」。你也可以将这个点子发挥的更淋漓尽致一点，比如<a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/12363790/how-many-activities-vs-fragments/12528434#12528434">创建一个fragment专门用于实现fragment的改变逻辑</a>，而不是将这些逻辑写在activity中。</li>
+<li><strong>甚至ActionBar也可以在fragment中管理。</strong>你可以创建一个没有UI的fragment，只用于管理ActionBar，或者在每一个当前可见的fragment中把自己需要的action项添加到父activity的ActionBar上。<a target="_blank" rel="noopener" href="http://www.grokkingandroid.com/adding-action-items-from-within-fragments/">阅读更多内容。</a></li>
+</ul>
+<p>虽然我们建议使用fragment，但是我们不建议大量使用<a target="_blank" rel="noopener" href="https://developer.android.com/about/versions/android-4.2.html#NestedFragments">嵌套的fragment</a>，因为可能会引起<a target="_blank" rel="noopener" href="http://delyan.me/android-s-matryoshka-problem/">matryoshka bugs</a>。只在合理的情况下（例如，水平滑动的ViewPager中的fragment嵌套在一个模拟屏幕的fragment中）或者经过深思熟虑时，才使用嵌套的fragment。</p>
+<p>从架构层面来讲，你的应用应该有一个顶层的activity，其中activity中包含了大部分的业务相关的fragment。你也可以有其他的辅助activity，只要这些activity和主activity的通信足够简单，能够通过<code>Intent.setData()</code>或者<code>Intent.setAction()</code>或者其他简单的方式实现即可。</p>
+<h2 id="Java包结构"><a href="#Java包结构" class="headerlink" title="Java包结构"></a>Java包结构</h2><p>Android应用程序的Java包结构可以用基本上近似于<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">模型-视图-控制器结构</a>。对于Android，<a target="_blank" rel="noopener" href="http://www.informit.com/articles/article.aspx?p=2126865">Fragment和Activity实际上就是控制类</a>。同时，这两者也是用户交互界面的一部分，因此，这两者也是视图。</p>
+<p>由于上述原因，将fragment（或者activity）严格的归类为控制器或者是视图是非常困难，不合理的。所以，更合理的做法是把fragment存放在专有的fragment包内。如果你遵循了前一部分的建议，那么可以将activity存放在最顶层的包下。如果你计划创建多于2个或3个activity，那么创建一个activities包。</p>
+<p>否则（译者注：如果没有fragment和activity），包结构看起来就是一个典型的MVC结构。有一个models包，存放主要用于JSON解析时API返回值的POJO对象；一个views包，存放你自定义的视图，通知，action bar视图和小部件等。Adapter的归类比较模糊，是处于数据和视图之间的位置。但是，一般情况下，adapter需要在getView()函数中引入一些视图，所以可以在views包下建一个adapters包来存放adpater。</p>
+<p>一些控制类是整个应用程序都需要使用到的，也更加接近安卓系统底层。这些控制类存放在managers包下。各种数据处理类，例如「DateUtils」，存放在utils包下。负责与后端服务器进行交互的类存放在network包下。</p>
+<p>总之，按靠近后端服务器到靠近用户的顺序排列，包结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">com.futurice.project</span><br><span class="line">├─ network</span><br><span class="line">├─ models</span><br><span class="line">├─ managers</span><br><span class="line">├─ utils</span><br><span class="line">├─ fragments</span><br><span class="line">└─ views</span><br><span class="line">   ├─ adapters</span><br><span class="line">   ├─ actionbar</span><br><span class="line">   ├─ widgets</span><br><span class="line">   └─ notifications</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><p><strong>命名。</strong>遵循以类型作为前缀的习惯，像type_foo_bar.xml。例如：fragment_contact_details.xml，view_primary_button.xml，activity_main.xml。</p>
+<p><strong>管理好布局XML代码。</strong>如果你不确定如何按照一定的格式来管理XML，可以参考以下几个习惯：</p>
+<ul>
+<li>一个属性占单独的一行，缩进4个空格</li>
+<li><code>android:id</code>总是第一个属性</li>
+<li><code>android:layout_****</code>属性放在顶部</li>
+<li>style属性放在底部</li>
+<li>标签关闭/&gt;独占一行，便于调整属性的顺序和增加属性</li>
+<li>不要在<code>android:text</code>中硬编码字符串，考虑使用Android Studio中提供的<a target="_blank" rel="noopener" href="http://tools.android.com/tips/layout-designtime-attributes">Designtime attributes功能</a><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;LinearLayout</span><br><span class="line">    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    android:orientation=&quot;vertical&quot;</span><br><span class="line">    &gt;</span><br><span class="line"> </span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:id=&quot;@+id/name&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_alignParentRight=&quot;true&quot;</span><br><span class="line">        android:text=&quot;@string/name&quot;</span><br><span class="line">        style=&quot;@style/FancyText&quot;</span><br><span class="line">        /&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;include layout=&quot;@layout/reusable_part&quot; /&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>最重要的规则是，在布局XML中定义<code>android:layout_****</code>属性，而其他的<code>android:****</code>属性则在样式XML中定义。这个规则有例外的情况，但是大部分情况下是适用的。这个规则保证只有layout属性（positioning, margin, sizing）和内容属性在布局文件中，其他的外观属性（colors, padding, font)则定义在样式文件中。</p>
+<p>例外的情况有：</p>
+<ul>
+<li><code>android:id</code>显然应该在布局文件中定义</li>
+<li>LinearLayout的<code>android:orientation</code>属性在布局文件中定义更为合理</li>
+<li><code>android:text</code>应该在布局文件中定义，因为它定义了特定的内容（译者注：属于内容属性）</li>
+<li>有时候创建通用的样式文件来定义<code>android:layout_width</code>和<code>android:layout_height</code>更加合理，但是一般情况下这两个属性应该在布局文件中定义。</li>
+</ul>
+<p><strong>使用样式。</strong>在项目中，重复的view的外观（译者注：重复的view属性）是很常见的，因此，基本上每个项目都需要恰当的使用样式。在一个应用程序中，至少应该有一个通用的文本内容的样式。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;style name=&quot;ContentText&quot;&gt;</span><br><span class="line">    &lt;item name=&quot;android:textSize&quot;&gt;@dimen/font_normal&lt;/item&gt;</span><br><span class="line">    &lt;item name=&quot;android:textColor&quot;&gt;@color/basic_black&lt;/item&gt;</span><br><span class="line">&lt;/style&gt;</span><br></pre></td></tr></table></figure>
+<p>应用到TextView当中如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;TextView</span><br><span class="line">    android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">    android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">    android:text=&quot;@string/price&quot;</span><br><span class="line">    style=&quot;@style/ContentText&quot;</span><br><span class="line">    /&gt;</span><br></pre></td></tr></table></figure>
+<p>你也可能需要给button按钮写一个通用的样式， 不过不要只停留在给文本内容和按钮写通用样式上。继续的深入应用这个思想，把View的相关的重复的属性写成通用的样式。</p>
+<p><strong>把大的样式文件分成多个小样式文件。</strong>你不一定非得只有一个styles.xml文件。Android SDK支持以非传统方式命名的样式文件。文件名styles并没有特别的作用，起作用的只是文件中的XML标签<code>&lt;style&gt;</code>。因此，一个项目中可以同时有这些样式文件styles.xml, styles_home.xml, styles_item_details.xml, styles_forms.xml。不像资源目录名那样在编译时有特殊意义，在res/values下的文件名是任意的。</p>
+<p><strong>colors.xml是颜色调色板。</strong>colors.xml中应该只包含一些颜色名字到RGBA颜色值的映射。不要在colors.xml中为不同的按钮定义不同的颜色。<br>不要像下面这样做：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;resources&gt;</span><br><span class="line">    &lt;color name=&quot;button_foreground&quot;&gt;#FFFFFF&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;button_background&quot;&gt;#2A91BD&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;comment_background_inactive&quot;&gt;#5F5F5F&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;comment_background_active&quot;&gt;#939393&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;comment_foreground&quot;&gt;#FFFFFF&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;comment_foreground_important&quot;&gt;#FF9D2F&lt;/color&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;color name=&quot;comment_shadow&quot;&gt;#323232&lt;/color&gt;</span><br></pre></td></tr></table></figure>
+<p>如果你像上面这种形式来定义颜色，你很快便开始定义重复的RGBA颜色值。这种情况下，需要改变基础色值时，工作将会变得非常复杂。并且，这些颜色定义跟上下文有关，像”button”和”comment”这些，应该在按钮的样式文件中定义，而不是在colors.xml中定义。</p>
+<p>你可以这样做：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;resources&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- grayscale --&gt;</span><br><span class="line">    &lt;color name=&quot;white&quot;     &gt;#FFFFFF&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;gray_light&quot;&gt;#DBDBDB&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;gray&quot;      &gt;#939393&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;gray_dark&quot; &gt;#5F5F5F&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;black&quot;     &gt;#323232&lt;/color&gt;</span><br><span class="line"> </span><br><span class="line">    </span><br><span class="line">&lt;!-- basic colors --&gt;</span><br><span class="line">    &lt;color name=&quot;green&quot;&gt;#27D34D&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;blue&quot;&gt;#2A91BD&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;orange&quot;&gt;#FF9D2F&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;red&quot;&gt;#FF432F&lt;/color&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/resources&gt;</span><br></pre></td></tr></table></figure>
+<p>像应用程序的设计者要这份颜色调色板。名字不一定非得是颜色的名字，例如green, blue等。像brand_primary, brand_secondary, brand_negative这中类型的名字也是完全可以接受的。以这种格式来管理颜色，在改变颜色值的时候会很方便，同时也可以很直观的看到使用了多少个不同的颜色。如果要展现一个漂亮的UI界面，减少颜色种类的使用是很重要的一点。</p>
+<p><strong>避免深层级视图。</strong>有时候，你想要在原有的视图xml中添加一个新的LinearLayout，以此来实现一个新的视图。那么，很有可能发生下面的情况：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;LinearLayout</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    android:orientation=&quot;vertical&quot;</span><br><span class="line">    &gt;</span><br><span class="line"> </span><br><span class="line">    &lt;RelativeLayout</span><br><span class="line">        ...</span><br><span class="line">        &gt;</span><br><span class="line"> </span><br><span class="line">        &lt;LinearLayout</span><br><span class="line">            ...</span><br><span class="line">            &gt;</span><br><span class="line"> </span><br><span class="line">            &lt;LinearLayout</span><br><span class="line">                ...</span><br><span class="line">                &gt;</span><br><span class="line"> </span><br><span class="line">                &lt;LinearLayout</span><br><span class="line">                    ...</span><br><span class="line">                    &gt;</span><br><span class="line">                &lt;/LinearLayout&gt;</span><br><span class="line"> </span><br><span class="line">            &lt;/LinearLayout&gt;</span><br><span class="line"> </span><br><span class="line">        &lt;/LinearLayout&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;/RelativeLayout&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>即使你没有直接在一个布局文件中看到上述的情况，当你在把一个视图填充（在Java代码中）到另一个视图中时，上述的情况也有可能发生。<br>这可能引发一系列的问题。可能会有性能问题，因为在这种情况下，处理器需要处理非常复杂的UI树。另外一个更严重的错误是<a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/2762924/java-lang-stackoverflow-error-suspected-too-many-views">栈溢出错误</a>。<br>因此，尽可能的减少视图的层级：学习如何使用<a target="_blank" rel="noopener" href="https://developer.android.com/guide/topics/ui/layout/relative.html">RelativeLayout</a>，如何<a target="_blank" rel="noopener" href="http://developer.android.com/training/improving-layouts/optimizing-layout.html">优化布局</a>和如何使用<a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/8834898/what-is-the-purpose-of-androids-merge-tag-in-xml-layouts"><code>&lt;merge&gt;</code>标签</a>。</p>
+<p><strong>谨慎处理与WebView相关的问题。</strong>当你必须显示一个网页时，例如一篇新闻，不要在客户端中处理HTML，更好的做法是向后端程序员请求”纯净”的HTML代码。当你把WebView绑定到activity上，而不是绑定到ApplicationContext上时，<a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/3130654/memory-leak-in-webview">WebView也可能会泄露内存</a>。不要使用WebView来展现简单文字或者按钮，用TextView和Button来实现。</p>
+<h2 id="测试框架"><a href="#测试框架" class="headerlink" title="测试框架"></a>测试框架</h2><p>Android SDK提供的测试框架仍旧不够完善，特别是UI测试。Android Gradle现在利用一个<a target="_blank" rel="noopener" href="http://developer.android.com/reference/android/test/package-summary.html">为安卓定制的JUnit帮助工具插件</a>，实现了一个测试框架<a target="_blank" rel="noopener" href="http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Testing">connectedAndroidTest</a>来执行你创建的JUnit测试。也就是说，在进行测试时，你需要连接设备或者模拟器。请根据官方的测试指南<a target="_blank" rel="noopener" href="http://developer.android.com/tools/testing/testing_android.html"><a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices">1</a></a> <a target="_blank" rel="noopener" href="http://developer.android.com/tools/testing/activity_test.html"><a target="_blank" rel="noopener" href="https://github.com/futurice/ios-good-practices">2</a></a>来操作。</p>
+<p><strong><a target="_blank" rel="noopener" href="http://robolectric.org/">Robolectric</a>只用于单元测试，不用于视图UI测试。</strong>为了保证开发速度，Robolectric这个测试框架致力于提供不连接设备时的测试，也即是适合于对模型和视图模型的单元测试。但是，在Robolectric的框架下测试UI是不准确，不完全的。在测试和动画，对话框相关的UI元素时，你可能会遇到一些问题。由此，你”坠入了深渊”（测试过程中看不到控制屏幕），这使测试变得非常复杂。</p>
+<p><a target="_blank" rel="noopener" href="https://code.google.com/p/robotium/">Robotium</a>让写UI测试变得非常容易。在Robotium测试框架下测试UI，你不需要进行连接设备的测试，但是利用Robotium提供的大量的帮助工具，你可以非常方便的分析视图UI和控制屏幕。测试用例也非常简单，以下是一个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">solo.sendKey(Solo.MENU);</span><br><span class="line">solo.clickOnText(&quot;More&quot;);</span><br><span class="line">// searches for the first occurence of &quot;More&quot; and clicks on it</span><br><span class="line">solo.clickOnText(&quot;Preferences&quot;);</span><br><span class="line">solo.clickOnText(&quot;Edit File Extensions&quot;);</span><br><span class="line">Assert.assertTrue(solo.searchText(&quot;rtf&quot;));</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="模拟器"><a href="#模拟器" class="headerlink" title="模拟器"></a>模拟器</h2><p>如果你以开发安卓应用为职业，那么买一个正版的<a target="_blank" rel="noopener" href="http://www.genymotion.com/">Genymotion模拟器</a>吧。相比于AVD模拟器，Genymotion模拟器具有更高的帧率。它提供了一些工具来演示你的应用，模拟网络连接质量，GPS定位等。当然，Genymotion也适合于进行连接设备的测试。（译者注：为了全面的测试）你需要买很多（但不是全部）不同的设备，因此花钱买一个正版的Genymotion模拟器会比买很多物理设备便宜很多。</p>
+<p>注意：Genymotion模拟器不会实现所有的谷歌服务，例如Google Play商店和地图。如果你需要测试三星独有的API，那还是有必要买一个三星的设备。</p>
+<h2 id="Proguard配置"><a href="#Proguard配置" class="headerlink" title="Proguard配置"></a>Proguard配置</h2><p>一般情况下，ProGuard用于缩减和混淆安卓项目的打包代码。</p>
+<p>是否使用Proguard取决于你的项目配置。大部分情况下，当你编译一个发行版本的apk时，你需要配置gradle来运行ProGuard。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">buildTypes &#123;</span><br><span class="line">    debug &#123;</span><br><span class="line">        runProguard false</span><br><span class="line">    &#125;</span><br><span class="line">    release &#123;</span><br><span class="line">        signingConfig signingConfigs.release</span><br><span class="line">        runProguard true</span><br><span class="line">        proguardFiles &#x27;proguard-rules.pro&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了判断要保留哪些代码，忽略或者混淆哪些代码，你必须明确的指出一个或者多个代码入口。 这些代码入口一般为包含有main函数的类，Java小程序（applet），移动信息设备小程序（Midlet），activity等。你在<code>SDK_HOME/tools/proguard/proguard-android.txt</code>可以找到安卓框架提供的默认配置。每个项目在<code>my-project/app/proguard-rules.pro</code>中自定义的proguard规则，（译者注：执行proguard时）会被附加到默认配置上。</p>
+<p>有一个跟ProGuard相关的常见问题，在应用程序启动时因为<code>ClassNotFoundException</code>或者<code>NoSuchFieldException</code>或者类似的异常而崩溃，即使你在编译命令行（例如，assmbleRelease）中成功的完成编译并且没有warning提示。不外乎以下两种情况：</p>
+<ol>
+<li>ProGuard认为一些类，枚举，方法，变量或者注解不需要，将其移除了。</li>
+<li>ProGuard混淆了类，枚举，或者变量，但是这些类可能被通过它原来的名字间接地调用了，例如，通过Java的反射机制调用。</li>
+</ol>
+<p>查看<code>app/build/outputs/proguard/release/usage.txt</code>，看造成崩溃问题的对象是否被移除了。<br>查看<code>app/build/outputs/proguard/release/mapping.txt</code>，看造成崩溃问题的对象是否被混淆了。</p>
+<p>为了防止ProGuard剔除需要用到的类或者类成员，在你的proguard配置中添加一个keep项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-keep class com.futurice.project.MyClass &#123; *; &#125;</span><br></pre></td></tr></table></figure>
+<p>为了防止ProGuard混淆一些类或者类成员，添加一个keepnames项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-keepnames class com.futurice.project.MyClass &#123; *; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这份<a target="_blank" rel="noopener" href="https://github.com/futurice/android-best-practices/blob/master/templates/rx-architecture/app/proguard-rules.pro">ProGuard配置模板</a>中有一些例子。在<a target="_blank" rel="noopener" href="http://proguard.sourceforge.net/#manual/examples.html">ProGuard文档</a>中有更多的例子。</p>
+<p><strong>提示：</strong>把每一个发行版本的mapping.txt文件都保存下来。这样，当用户遇到一个bug，提交了一个混淆的调用栈时，便可以根据保存的mapping.txt来调试，找到问题所在。</p>
+<p><strong>DexGuard。</strong>如果你需要一个不错的工具来优化代码，特别是经过混淆的发行版代码，考虑使用DexGuard。DexGuard是有ProGuard团队做的一个商业软件。利用DexGuard，可以很容易的分割Dex文件，解决了65k方法空间限制的问题。</p>
+<h2 id="感谢"><a href="#感谢" class="headerlink" title="感谢"></a>感谢</h2><p>感谢Antti Lammi, Joni Karppinen, Peter Tackage, Timo Tuominen, Vera Izrailit, Vihtori Mäntylä, Mark Voit, Andre Medeiros, Paul Houghton和其他Futurice开发者分享关于安卓开发的知识。</p>
+<h2 id="许可"><a href="#许可" class="headerlink" title="许可"></a>许可</h2><p><a target="_blank" rel="noopener" href="https://github.com/JefferyFan/android-best-practices/blob/master/www.futurice.com">Futurice Oy</a> Creative Commons Attribution 4.0 International (CC BY 4.0)</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Jeffery Fan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jefferyfan.github.io/2015/01/31/translation/BestPraticeOfAndroidDev/" title="Android开发之最佳实践">https://jefferyfan.github.io/2015/01/31/translation/BestPraticeOfAndroidDev/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android,</a>
+              <a href="/tags/Guideline/" rel="tag"># Guideline</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/01/20/programing/language-c/CppBase/" rel="prev" title="C++基础">
+      <i class="fa fa-chevron-left"></i> C++基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2015/04/12/programing/iOS/tutorial/01MemoryManage/" rel="next" title="iOS教程（一）iOS内存管理">
+      iOS教程（一）iOS内存管理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-SDK"><span class="nav-number">2.</span> <span class="nav-text">Android SDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.</span> <span class="nav-text">编译系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gradle%E9%85%8D%E7%BD%AE"><span class="nav-number">5.</span> <span class="nav-text">Gradle配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IDE%E5%92%8C%E6%96%87%E6%9C%AC%E7%BC%96%E8%BE%91%E5%99%A8"><span class="nav-number">6.</span> <span class="nav-text">IDE和文本编辑器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%93"><span class="nav-number">7.</span> <span class="nav-text">库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Activities-and-Fragments"><span class="nav-number">8.</span> <span class="nav-text">Activities and Fragments</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E5%8C%85%E7%BB%93%E6%9E%84"><span class="nav-number">9.</span> <span class="nav-text">Java包结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">10.</span> <span class="nav-text">资源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6"><span class="nav-number">11.</span> <span class="nav-text">测试框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E5%99%A8"><span class="nav-number">12.</span> <span class="nav-text">模拟器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Proguard%E9%85%8D%E7%BD%AE"><span class="nav-number">13.</span> <span class="nav-text">Proguard配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%84%9F%E8%B0%A2"><span class="nav-number">14.</span> <span class="nav-text">感谢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B8%E5%8F%AF"><span class="nav-number">15.</span> <span class="nav-text">许可</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeffery Fan"
+      src="/images/portrait.jpg">
+  <p class="site-author-name" itemprop="name">Jeffery Fan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jefferyfan" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jefferyfan" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jefferyfan93@gmail.com" title="E-Mail → mailto:jefferyfan93@gmail.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备19143927号-1 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jeffery Fan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"nLj8cRR6o6aa9DbLqyAwXk2k-gzGzoHsz","app_key":"h2V8q3Ga0czmbhLkB8CO4zzF","server_url":null,"security":false,"betterPerformance":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'nLj8cRR6o6aa9DbLqyAwXk2k-gzGzoHsz',
+      appKey     : 'h2V8q3Ga0czmbhLkB8CO4zzF',
+      placeholder: "Just Go Go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+function GridItem(row, column) {
+    this.row = row;
+    this.column = column;
+    this.possibleNums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    this.removeNum = function(num) {
+        var index = this.possibleNums.indexOf(num);
+        if (index > -1) {
+            this.possibleNums = this.possibleNums.slice(0, index).concat(this.possibleNums.slice(index+1));
+        }
+    }
+
+    this.pop = function() {
+        return this.possibleNums.pop();
+    }
+}
+
+function Board(data)
+{
+    this.data = data;
+    this.nextPossibleItem = function() {
+        var gridItem = undefined;
+        for (var row = 1; row <= 9; ++row) {
+            var rowArr = this.data[row-1];
+            for (var column = 1; column <= 9; ++column) {
+                if (rowArr[column-1] == 0) {
+                    gridItem = new GridItem(row, column);
+                    break;
+                }
+            }
+
+            if (gridItem) {
+                break;
+            }
+        }
+
+        if (gridItem) {
+            // check row and column
+            for (var idx = 1; idx <= 9; ++idx) {
+                if (idx != gridItem.column && this.get(gridItem.row, idx) > 0) {
+                    gridItem.removeNum(this.get(gridItem.row, idx));
+                }
+
+                if (idx != gridItem.row && this.get(idx, gridItem.column) > 0) {
+                    gridItem.removeNum(this.get(idx, gridItem.column));
+                }
+            }
+
+            // check 3*3 grid
+            var rowStart = parseInt((gridItem.row - 1) / 3) * 3 + 1;
+            var colStart = parseInt((gridItem.column - 1) / 3) * 3 + 1;
+            for (var row = rowStart; row <= rowStart + 2; ++row) {
+                for (var column = colStart; column <= colStart+2; ++column) {
+                    if (this.get(row, column) > 0) {
+                        gridItem.removeNum(this.get(row, column));
+                    }
+                }
+            }
+        }
+
+        return gridItem;
+    }
+
+    this.get = function(row, column) {
+        return this.data[row-1][column-1];
+    }
+
+    this.set = function(row, column, value) {
+        this.data[row-1][column-1] = value;
+    }
+}
+
+function resetTable() {
+    var tbody = document.getElementById('sudo-panel').children[0];
+    for (var row = 1; row <= 9; ++row) {
+        var tr = tbody.children[parseInt((row - 1) / 3) + row - 1];
+        for (var column = 1; column <= 9; ++column) {
+            var td = tr.children[parseInt((column - 1) / 3) + column - 1];
+            td.children[0].value = '';
+        }
+    }
+}
+
+function parseTable() {
+    var tbody = document.getElementById('sudo-panel').children[0];
+    var data = [
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
+    ];
+
+    for (var row = 1; row <= 9; ++row) {
+        var tr = tbody.children[parseInt((row - 1) / 3) + row - 1];
+        for (var column = 1; column <= 9; ++column) {
+            var td = tr.children[parseInt((column - 1) / 3) + column - 1];
+            var value = td.children[0].value;
+            if (value && value.length > 0) {
+                value = parseInt(value);
+                if (value < 1 || value > 9) {
+                    value = 0;
+                }
+            }
+            else {
+                value = 0;
+            }
+
+            data[row-1][column-1] = value;
+        }
+    }
+
+    return data;
+}
+
+function putData(data) {
+    var tbody = document.getElementById('sudo-panel').children[0];
+    for (var row = 1; row <= 9; ++row) {
+        var tr = tbody.children[parseInt((row - 1) / 3) + row - 1];
+        for (var column = 1; column <= 9; ++column) {
+            var td = tr.children[parseInt((column - 1) / 3) + column - 1];
+            td.children[0].value = data[row-1][column-1] + '';
+        }
+    }
+}
+
+function startSudo() {
+    var btn = document.getElementById('sudo-btn');
+    btn.disabled = true;
+    btn.innerText = "求解ing";
+    document.getElementById('sudo-panel').classList.add('sudo-disable');
+
+    var stack = [];
+    var board = new Board(parseTable());
+    var nextItem = board.nextPossibleItem();
+    nextItem && stack.push(nextItem);
+
+    while (true) {
+        var lastItem = stack[stack.length - 1];
+        if (lastItem) {
+            var value = lastItem.pop();
+            if (value != undefined) {
+                board.set(lastItem.row, lastItem.column, value);
+
+                nextItem = board.nextPossibleItem();
+                if (nextItem == undefined) {
+                    break;
+                }
+                else if (nextItem.possibleNums.length > 0) {
+                    stack.push(nextItem);
+                }
+            }
+            else {
+                board.set(lastItem.row, lastItem.column, 0);
+                stack.pop();
+            }
+        }
+        else {
+            break;
+        }
+    }
+
+    putData(board.data);
+
+    btn.disabled = false;
+    btn.innerText = "求解";
+    document.getElementById('sudo-panel').classList.remove('sudo-disable');
+}

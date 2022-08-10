@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jefferyfan.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="很久之前，写过一篇文章Hexo博客使用教程，介绍大概如何使用Hexo新建一个博客并部署到github上。最近抽空买了个域名和VPS，把自己的博客部署到自己的VPS上。在此分享下，正在考虑购买域名和VPS的同学可以进来看看。另外，在文章结尾，推荐一款Markdown写作App。 如果大家对于自己部署博客有什么疑问，欢迎留言讨论。 更新2016-07-25：将DNS管理从DNSPod迁移到CloudX">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo博客自定义域名和部署到VPS">
+<meta property="og:url" content="https://jefferyfan.github.io/2016/07/24/guide/hexo-custom-host-vps/index.html">
+<meta property="og:site_name" content="Jeffery&#39;s Blog">
+<meta property="og:description" content="很久之前，写过一篇文章Hexo博客使用教程，介绍大概如何使用Hexo新建一个博客并部署到github上。最近抽空买了个域名和VPS，把自己的博客部署到自己的VPS上。在此分享下，正在考虑购买域名和VPS的同学可以进来看看。另外，在文章结尾，推荐一款Markdown写作App。 如果大家对于自己部署博客有什么疑问，欢迎留言讨论。 更新2016-07-25：将DNS管理从DNSPod迁移到CloudX">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jefferyfan.github.io/images/14693444963960.jpg">
+<meta property="og:image" content="https://jefferyfan.github.io/images/14693454532180.jpg">
+<meta property="article:published_time" content="2016-07-24T07:47:40.000Z">
+<meta property="article:modified_time" content="2022-08-10T08:57:55.891Z">
+<meta property="article:author" content="Jeffery Fan">
+<meta property="article:tag" content="Guide">
+<meta property="article:tag" content="Hexo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jefferyfan.github.io/images/14693444963960.jpg">
+
+<link rel="canonical" href="https://jefferyfan.github.io/2016/07/24/guide/hexo-custom-host-vps/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Hexo博客自定义域名和部署到VPS | Jeffery's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c6d56a4590a7e7d056f66c6777e57527";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Jeffery's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">为而不争</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jefferyfan.github.io/2016/07/24/guide/hexo-custom-host-vps/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/portrait.jpg">
+      <meta itemprop="name" content="Jeffery Fan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jeffery's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hexo博客自定义域名和部署到VPS
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-07-24 15:47:40" itemprop="dateCreated datePublished" datetime="2016-07-24T15:47:40+08:00">2016-07-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Guide/" itemprop="url" rel="index"><span itemprop="name">Guide</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Guide/Hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2016/07/24/guide/hexo-custom-host-vps/" class="post-meta-item leancloud_visitors" data-flag-title="Hexo博客自定义域名和部署到VPS" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2016/07/24/guide/hexo-custom-host-vps/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2016/07/24/guide/hexo-custom-host-vps/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>很久之前，写过一篇文章<a href="/2015/07/22/guide/hexo-guide/">Hexo博客使用教程</a>，介绍大概如何使用Hexo新建一个博客并部署到github上。最近抽空买了个域名和VPS，把自己的博客部署到自己的VPS上。在此分享下，正在考虑购买域名和VPS的同学可以进来看看。另外，在文章结尾，推荐一款Markdown写作App。</p>
+<p>如果大家对于自己部署博客有什么疑问，欢迎留言讨论。</p>
+<p><strong>更新</strong><br>2016-07-25：<a href="#%E5%9F%9F%E5%90%8D">将DNS管理从DNSPod迁移到CloudXNS上。</a>推荐大家使用CloudXNS。增加博客仓库介绍以及Markdown写作App推荐。</p>
+<h3 id="VPS"><a href="#VPS" class="headerlink" title="VPS"></a>VPS</h3><p>VPS可以到搬瓦工或者DigitalOcean上购买。链接就不提供了，谷歌一下很容易找到。<br>搬瓦工3USD一个月，DO要5USD一个月。考虑到目前博客访问量比较少，搬瓦工最低配置都够用了，所以选择了搬瓦工。迟点等VPN到期之后准备迁移到DO上，当博客主机和自己架ShadowSocks。</p>
+<p>对着阮一峰的博客 <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2014/03/server_setup.html">Linux服务器的初步配置流程</a> ，把VPS设置好。补充一些阮一峰博客没有提到的点：</p>
+<ul>
+<li>终端老是报错误：</li>
+</ul>
+<blockquote>
+<p>locale: Cannot set LC_CTYPE to default locale: No such file or directory<br>locale: Cannot set LC_ALL to default locale: No such file or director</p>
+</blockquote>
+<span id="more"></span>
+
+<p>解决方法是在<code>~/.profile</code>中添加<code>export LC_ALL=&quot;en_US.UTF-8&quot;</code></p>
+<ul>
+<li>安装和配置apache</li>
+</ul>
+<p>运行安装命令：<code>sudo apt-get install apache2</code><br>安装完成后修改<code>/etc/apache2/sites-enabled/000-default</code>站点配置文件。配置如下。把<code>/home/fanjie/blog</code>替换成自己的服务器根目录。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">&lt;VirtualHost *<span class="number">:80</span>&gt;</span></span><br><span class="line">    <span class="attribute">DocumentRoot</span> /home/fanjie/blog</span><br><span class="line">    <span class="section">&lt;Directory /&gt;</span></span><br><span class="line">        <span class="attribute">Options</span> FollowSymLinks</span><br><span class="line">        <span class="attribute">AllowOverride</span> None</span><br><span class="line">    <span class="section">&lt;/Directory&gt;</span></span><br><span class="line">    <span class="section">&lt;Directory /home/fanjie/blog&gt;</span></span><br><span class="line">        <span class="attribute">Options</span> -Indexes FollowSymLinks MultiViews</span><br><span class="line">        <span class="attribute">AllowOverride</span> None</span><br><span class="line">        <span class="attribute">Order</span> <span class="literal">allow</span>,<span class="literal">deny</span></span><br><span class="line">        <span class="attribute">allow</span> from <span class="literal">all</span></span><br><span class="line">    <span class="section">&lt;/Directory&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">LogLevel</span> warn</span><br><span class="line"></span><br><span class="line">    <span class="attribute">CustomLog</span> <span class="variable">$&#123;APACHE_LOG_DIR&#125;</span>/access.log combined</span><br><span class="line"><span class="section">&lt;/VirtualHost&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>修改完配置后<code>sudo apachectl restart</code>重启apache。</p>
+<h3 id="域名"><a href="#域名" class="headerlink" title="域名"></a>域名</h3><p>在namesilo上购买域名，namesilo赠送WHOIS隐私保护。如果你选择其他域名提供商，纠结于要不要购买WHOIS隐私保护，可以看看我在V2EX上发起的讨论：<a target="_blank" rel="noopener" href="http://v2ex.com/t/292986">买域名有必要买隐私保护么？</a></p>
+<p><del>DNS解析服务选择国内的DNSPod。</del> 域名解析服务使用<a target="_blank" rel="noopener" href="https://www.cloudxns.net/">CloudXNS</a>。相比于DNSPod，CloudXNS更新域名解析记录的速度非常快，并且域名解析速度也比DNSPod的快。不过以下的DNS解析记录设置还是基于DNSPod，CloudXNS类似。</p>
+<ol>
+<li><p>在namesile上修改域名服务商地址。在namesilo上修改了域名服务商，才能在DNSPod上配置域名解析记录。地址修改如下。<br><img src="/images/14693444963960.jpg" alt="域名解析地址接管设置示例"></p>
+</li>
+<li><p>在DNSPod上添加域名解析记录<br>先介绍下常用的两种域名解析记录。</p>
+</li>
+</ol>
+<ul>
+<li><p>A记录<br>A记录是将域名指向到IP地址。例如，将<code>duxevr.com</code>指向到VPS的IP地址，则需要新增一个A记录。</p>
+</li>
+<li><p>CNAME记录<br>将域名指向域名，别名。例如，我将<code>duxevr.com</code>指向我的VPS服务器，同时也希望<code>blog.duxevr.com</code>也指向VPS服务器，那么新增一个CNAME记录，将<code>blog.duxevr.com</code>指向<code>duxevr.com</code>。下次VPS迁移导致IP地址变化时，就只需要更改<code>duxevr.com</code>的A记录中的IP地址就行了，CNAME记录不需要更改。</p>
+</li>
+</ul>
+<p>DNSPod上的解析记录，给大家参考下。<br><img src="/images/14693454532180.jpg" alt="DNS解析记录示例"></p>
+<p><strong>主机记录（host）</strong>：二级域名的前缀。例如<code>blog.duxevr.com</code>的主机记录为<code>blog</code></p>
+<p><strong>TTL（Time To Live）</strong>：域名解析记录的缓存的存活时间。一般来说，域名解析不经常变动的情况下，TTL设置大一点。当需要修改时，就TTL值改小一点，等带一段DNS的覆盖时间，再修改DNS解析记录。</p>
+<h3 id="github博客重定向到duxevr-com"><a href="#github博客重定向到duxevr-com" class="headerlink" title="github博客重定向到duxevr.com"></a>github博客重定向到duxevr.com</h3><p>在source文件夹中新增加一个文件CNAME，文件内容为<code>blog.duxevr.com</code>。重新发布博客。当访问<code>http://jefferyfan.github.io</code>时，会被重定向至<code>http://blog.duxevr.com</code>。</p>
+<h3 id="博客仓库结构"><a href="#博客仓库结构" class="headerlink" title="博客仓库结构"></a>博客仓库结构</h3><p>目前博客分为三个仓库。</p>
+<ol>
+<li>主题Next仓库：从源仓库fork出来，有一些地方做了小修改，定期merge源仓库。</li>
+<li>博客配置仓库。主要是除主题、博客文章之外的不包含敏感信息的文件。</li>
+<li>博客HTML代码仓库。其实就是一开始将博客挂在github的那个仓库。发布博客都是先发布到这个仓库，再到vps上执行<code>git pull</code>来更新。</li>
+<li>博客文章使用dropbox同步。dropbox自动同步，不用每次修改之后都提交到git。</li>
+</ol>
+<p>不过，发布流程有些麻烦，需要先执行<code>hexo d</code>，再登陆到vps上执行<code>git pull</code>。写了个脚本，一键发布！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> `<span class="built_in">dirname</span> <span class="variable">$0</span>`/..</span><br><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;\nDeploy to github&quot;</span></span><br><span class="line">hexo d</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;\nDeploy to VPS&quot;</span></span><br><span class="line">ssh vps <span class="string">&quot;cd ~/blog;git checkout .;git clean -xdf;git pull&quot;</span></span><br></pre></td></tr></table></figure>
+<p>其中，最后一句中，大家需要把<code>vps</code>替换成自己的<code>.ssh/config</code>中VPS配置的Host；<code>~/blog</code>替换成VPS上的博客目录。</p>
+<h3 id="Markdown写作App"><a href="#Markdown写作App" class="headerlink" title="Markdown写作App"></a>Markdown写作App</h3><p>推荐国内自由开发者完成的Markdown写作App－－<a target="_blank" rel="noopener" href="http://zh.mweb.im/">MWeb</a>，配合dropbox，写博客简直不能再完美。</p>
+<p>有一点特别喜欢，图片粘贴后直接保存到设置好的文件夹。如果你的图片都放在source的子目录下，正好可以配合这个功能使用。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Jeffery Fan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jefferyfan.github.io/2016/07/24/guide/hexo-custom-host-vps/" title="Hexo博客自定义域名和部署到VPS">https://jefferyfan.github.io/2016/07/24/guide/hexo-custom-host-vps/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Guide/" rel="tag"># Guide</a>
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/07/16/programing/algorithm/dfs-gfs-sudo/" rel="prev" title="广搜&深搜算法和数独求解">
+      <i class="fa fa-chevron-left"></i> 广搜&深搜算法和数独求解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/08/07/programing/base/big-little-endian/" rel="next" title="大端规则和小端规则">
+      大端规则和小端规则 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#VPS"><span class="nav-number">1.</span> <span class="nav-text">VPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%9F%E5%90%8D"><span class="nav-number">2.</span> <span class="nav-text">域名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#github%E5%8D%9A%E5%AE%A2%E9%87%8D%E5%AE%9A%E5%90%91%E5%88%B0duxevr-com"><span class="nav-number">3.</span> <span class="nav-text">github博客重定向到duxevr.com</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%9A%E5%AE%A2%E4%BB%93%E5%BA%93%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">博客仓库结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown%E5%86%99%E4%BD%9CApp"><span class="nav-number">5.</span> <span class="nav-text">Markdown写作App</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeffery Fan"
+      src="/images/portrait.jpg">
+  <p class="site-author-name" itemprop="name">Jeffery Fan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jefferyfan" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jefferyfan" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jefferyfan93@gmail.com" title="E-Mail → mailto:jefferyfan93@gmail.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备19143927号-1 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jeffery Fan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"nLj8cRR6o6aa9DbLqyAwXk2k-gzGzoHsz","app_key":"h2V8q3Ga0czmbhLkB8CO4zzF","server_url":null,"security":false,"betterPerformance":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'nLj8cRR6o6aa9DbLqyAwXk2k-gzGzoHsz',
+      appKey     : 'h2V8q3Ga0czmbhLkB8CO4zzF',
+      placeholder: "Just Go Go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
