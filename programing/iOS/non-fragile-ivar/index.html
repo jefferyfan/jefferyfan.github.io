@@ -23,16 +23,16 @@
   <meta name="description" content="Objective-C 是一门动态语言。所谓动态，在于消息发送和转发，在于 Method Swizzling，同时也在于 Non-fragile ivar。之前有一篇文章简单介绍过消息发送和转发（iOS教程（二）消息发送），这一篇主要介绍下 Non-fragile ivar 特性及其实现方式。 什么是 ivar ？ivar（instance variable）就是类成员变量。一般情况下，prope">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Objective-C 动态之 Non-fragile ivar">
-<meta property="og:url" content="https://jefferyfan.github.io/programing/iOS/non-fragile-ivar/index.html">
+<meta property="og:url" content="http://jefferyfan.github.io/programing/iOS/non-fragile-ivar/index.html">
 <meta property="og:site_name" content="Jeffery&#39;s Blog">
 <meta property="og:description" content="Objective-C 是一门动态语言。所谓动态，在于消息发送和转发，在于 Method Swizzling，同时也在于 Non-fragile ivar。之前有一篇文章简单介绍过消息发送和转发（iOS教程（二）消息发送），这一篇主要介绍下 Non-fragile ivar 特性及其实现方式。 什么是 ivar ？ivar（instance variable）就是类成员变量。一般情况下，prope">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jefferyfan.github.io/images/ivar-layout.jpeg">
-<meta property="og:image" content="https://jefferyfan.github.io/images/custom-view.jpeg">
-<meta property="og:image" content="https://jefferyfan.github.io/images/custom-view-fragiled.jpeg">
-<meta property="og:image" content="https://jefferyfan.github.io/images/custom-view-non-fragile.jpeg">
-<meta property="og:image" content="https://jefferyfan.github.io/images/ivar-disassemblly.jpg">
-<meta property="og:image" content="https://jefferyfan.github.io/images/15744183679980.jpg">
+<meta property="og:image" content="http://jefferyfan.github.io/images/ivar-layout.jpeg">
+<meta property="og:image" content="http://jefferyfan.github.io/images/custom-view.jpeg">
+<meta property="og:image" content="http://jefferyfan.github.io/images/custom-view-fragiled.jpeg">
+<meta property="og:image" content="http://jefferyfan.github.io/images/custom-view-non-fragile.jpeg">
+<meta property="og:image" content="http://jefferyfan.github.io/images/ivar-disassemblly.jpg">
+<meta property="og:image" content="http://jefferyfan.github.io/images/15744183679980.jpg">
 <meta property="article:published_time" content="2019-11-22T07:29:21.000Z">
 <meta property="article:modified_time" content="2022-08-10T08:57:55.892Z">
 <meta property="article:author" content="Jeffery Fan">
@@ -40,9 +40,9 @@
 <meta property="article:tag" content="Objective-C">
 <meta property="article:tag" content="ivar">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://jefferyfan.github.io/images/ivar-layout.jpeg">
+<meta name="twitter:image" content="http://jefferyfan.github.io/images/ivar-layout.jpeg">
 
-<link rel="canonical" href="https://jefferyfan.github.io/programing/iOS/non-fragile-ivar/">
+<link rel="canonical" href="http://jefferyfan.github.io/programing/iOS/non-fragile-ivar/">
 
 
 <script id="page-configurations">
@@ -185,7 +185,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jefferyfan.github.io/programing/iOS/non-fragile-ivar/">
+    <link itemprop="mainEntityOfPage" href="http://jefferyfan.github.io/programing/iOS/non-fragile-ivar/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/portrait.jpg">
@@ -388,7 +388,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://jefferyfan.github.io/programing/iOS/non-fragile-ivar/" title="Objective-C 动态之 Non-fragile ivar">https://jefferyfan.github.io/programing/iOS/non-fragile-ivar/</a>
+    <a href="http://jefferyfan.github.io/programing/iOS/non-fragile-ivar/" title="Objective-C 动态之 Non-fragile ivar">http://jefferyfan.github.io/programing/iOS/non-fragile-ivar/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
