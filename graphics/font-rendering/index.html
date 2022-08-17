@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"jefferyfan.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前⾔本⽂旨在介绍⽂字渲染需要了解的基本知识点，以及些许延伸扩展；不涉及到实际代码的编写，不涉及具体算法实现，但中间穿插引⽤的外部⽂档有部分代码实现可供参考。  本文引用的图都是来源网络博文，部分图片并未记录来源。如涉及侵权请联系我。  字体发展历史 在 Macintosh 电脑中，使用点阵字体（格式后缀：bdf、pcf、fnt、hbf等)。点阵字体放大后会出现锯齿、模糊的情况。 在同一时期，Ado">
+<meta property="og:type" content="article">
+<meta property="og:title" content="字体渲染概览">
+<meta property="og:url" content="http://jefferyfan.github.io/graphics/font-rendering/index.html">
+<meta property="og:site_name" content="Jeffery&#39;s Blog">
+<meta property="og:description" content="前⾔本⽂旨在介绍⽂字渲染需要了解的基本知识点，以及些许延伸扩展；不涉及到实际代码的编写，不涉及具体算法实现，但中间穿插引⽤的外部⽂档有部分代码实现可供参考。  本文引用的图都是来源网络博文，部分图片并未记录来源。如涉及侵权请联系我。  字体发展历史 在 Macintosh 电脑中，使用点阵字体（格式后缀：bdf、pcf、fnt、hbf等)。点阵字体放大后会出现锯齿、模糊的情况。 在同一时期，Ado">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/dot_font_1.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/dot_font_2.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/vector_font_1.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/vector_font_2.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_font.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_figure_1.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_figure_2.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_figure_3.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_smooth_1.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_smooth_2.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_corner.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_example_1.gif">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_example_2.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_example_3.gif">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_example_4.gif">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/sdf_example_5.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/table_directory.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/table_record.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/maxp.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/loca.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/glyf_1.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/glyf_2.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/glyf_3.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/bezier.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/outline_1.png">
+<meta property="og:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/outline_2.png">
+<meta property="article:published_time" content="2022-08-16T12:44:13.000Z">
+<meta property="article:modified_time" content="2022-08-17T14:56:54.919Z">
+<meta property="article:author" content="Jeffery Fan">
+<meta property="article:tag" content="Graphics">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jefferyfan.github.io/images/graphics/font-rendering/dot_font_1.png">
+
+<link rel="canonical" href="http://jefferyfan.github.io/graphics/font-rendering/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>字体渲染概览 | Jeffery's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c6d56a4590a7e7d056f66c6777e57527";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Jeffery's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">为而不争</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jefferyfan.github.io/graphics/font-rendering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/portrait.jpg">
+      <meta itemprop="name" content="Jeffery Fan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jeffery's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          字体渲染概览
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-16 20:44:13" itemprop="dateCreated datePublished" datetime="2022-08-16T20:44:13+08:00">2022-08-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Graphics/" itemprop="url" rel="index"><span itemprop="name">Graphics</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/graphics/font-rendering/" class="post-meta-item leancloud_visitors" data-flag-title="字体渲染概览" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/graphics/font-rendering/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/graphics/font-rendering/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前⾔"><a href="#前⾔" class="headerlink" title="前⾔"></a>前⾔</h2><p>本⽂旨在介绍⽂字渲染需要了解的基本知识点，以及些许延伸扩展；不涉及到实际代码的编写，不涉及具体算法实现，但中间穿插引⽤的外部⽂档有部分代码实现可供参考。</p>
+<blockquote>
+<p>本文引用的图都是来源网络博文，部分图片并未记录来源。如涉及侵权请联系我。</p>
+</blockquote>
+<h2 id="字体发展历史"><a href="#字体发展历史" class="headerlink" title="字体发展历史"></a>字体发展历史</h2><ul>
+<li>在 Macintosh 电脑中，使用点阵字体（格式后缀：bdf、pcf、fnt、hbf等)。点阵字体放大后会出现锯齿、模糊的情况。</li>
+<li>在同一时期，Adobe 发明了基于 PostScript Type 1 的矢量字体格式，但 Type 1 字体是加密的，Adobe 通过售卖字体认证赚取利润，苹果也不得不向 Adobe 购买 Type 1 字体认证。</li>
+<li>于是，苹果决定设计全新的字体格式，最后在 1991 年发布为 TrueType 格式，同时也包括 Times Roman、Helvetica、Courier 等大量字体。</li>
+<li>但是 TrueType 字体反响并不好，因为大部分用户已经购买了 Adobe Type 1 字体，没必要再切换。因此，苹果联合微软对抗 Adobe，授权给微软使用 TrueType 字体。1991年，微软在 Windows 3.1 系统上支持了 TrueType，并和 MonoType 公司联合开发了大量著名字体，例如 Arial 等字体。</li>
+<li>1994 年，微软独自开发了 TrueType Open 字体；1996 年 Adobe 加入开发，兼容了 Type1 字体格式，更名为 OpenType。2007 年，OpenType 被国际标准组织 (ISO）采用。OpenType 常见后缀 otf、ttf、ttc。</li>
+<li>2023年，Adobe 将停止支持 Type 1 字体创作。</li>
+</ul>
+<br/>
+
+<blockquote>
+<p><strong>SFNT</strong>：SFNT 是苹果在开发 TrueType 字体格式时设计的通⽤字体数据存储结构，SFNT 是 spline font 或者 scalable font 的缩写，TrueType、OpenType、WOFF 等格式都采⽤ SFNT 作为容器。 </p>
+<p><strong>WOFF</strong>：Web Open Font Format，采⽤压缩格式，字体⽂件更⼩，适合⽹⻚使⽤。可以简单理解为 OpenType + 压缩。⼀般⽐ ttf 字体⼩ 40%。WOFF2 是 WOFF 的下⼀代标准，在 WOFF 的基础上提⾼ 30% 的 压缩率。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="字体类型"><a href="#字体类型" class="headerlink" title="字体类型"></a>字体类型</h2><h3 id="点阵字体-图集字体"><a href="#点阵字体-图集字体" class="headerlink" title="点阵字体 / 图集字体"></a>点阵字体 / 图集字体</h3><div style="display: flex; align-items: center">
+<img src="/images/graphics/font-rendering/dot_font_1.png" width="40%" height="100%">
+<img src="/images/graphics/font-rendering/dot_font_2.png" width="58%" height="100%">
+</div>
+
+
+<h3 id="⽮量字体"><a href="#⽮量字体" class="headerlink" title="⽮量字体"></a>⽮量字体</h3><p>如下图所⽰，利⽤直线和<a target="_blank" rel="noopener" href="https://leovan.me/cn/2019/02/bezier-curve/">⻉塞尔曲线</a>来描述字体。每个字形中存储的是⼀系列控制点，由控制点⽣成字的轮廓，再进⾏填充颜⾊。</p>
+<blockquote>
+<p>轮廓：指由直线、⼆阶⻉塞尔曲线组成的闭合曲线。</p>
+</blockquote>
+<div style="display: flex; align-items: center">
+<img src="/images/graphics/font-rendering/vector_font_1.png" width="40%" height="100%">
+<img src="/images/graphics/font-rendering/vector_font_2.png" width="58%" height="100%">
+</div>
+
+<h2 id="点阵-图集字体渲染"><a href="#点阵-图集字体渲染" class="headerlink" title="点阵 / 图集字体渲染"></a>点阵 / 图集字体渲染</h2><p>点阵 / 图集字体的渲染，其实就类似图⽚纹理的渲染。通过⼀定的策略，找到对应⽂字的纹理坐标进⾏渲染即可。<br>点阵字体已经淘汰，但图集形式的字体，在某些场景下还会⽤到，但存在「放⼤后模糊」等问题。但是，利⽤ SDF 可以实现⽆损放⼤。</p>
+<h3 id="有向距离场-SDF-Signed-Distance-Field"><a href="#有向距离场-SDF-Signed-Distance-Field" class="headerlink" title="有向距离场 SDF (Signed Distance Field)"></a>有向距离场 SDF (Signed Distance Field)</h3><p><img src="/images/graphics/font-rendering/sdf_font.png" alt="SDF 字体"></p>
+<p><strong>SDF 中每个像素，不再表⽰字体光栅化后的颜⾊，取⽽代之记录的是从⼀个点到集合边界的的距离值，其值的正负对应该点在集合外部或内部。</strong></p>
+<p>在⽂字渲染这个场景下，遍历光栅化后⽂字纹理中所有的像素，将像素分为 in 和 out 两种，对于⽬标纹理的每个像素，找到源纹理中对应的像素，对这个像素求最近的和⾃⼰不是同⼀种像素之间的距离，其中 in 记录为正值，out 记录为负值。最后再将距离映射到 0 - 1 之间。 </p>
+<div style="display: flex; align-items: center">
+<img src="/images/graphics/font-rendering/sdf_figure_1.png" width="37%" height="100%">
+<img src="/images/graphics/font-rendering/sdf_figure_2.png" width="30%" height="100%">
+<img src="/images/graphics/font-rendering/sdf_figure_3.png" width="32%" height="100%">
+</div>
+
+<p>那么在 0.5 附近就是边界，因此在 0.5 ± delta 区域做平滑，其余 &lt; 0.5 不填充，&gt; 0.5 填充即可。 </p>
+<div style="display: flex; align-items: center">
+<img src="/images/graphics/font-rendering/sdf_smooth_1.png" width="46%" height="100%">
+<img src="/images/graphics/font-rendering/sdf_smooth_2.png" width="52%" height="100%">
+</div>
+
+
+
+<h3 id="SDF-的问题以及-MSDF"><a href="#SDF-的问题以及-MSDF" class="headerlink" title="SDF 的问题以及 MSDF"></a>SDF 的问题以及 MSDF</h3><p>利⽤ MSDF 的渲染，锐利的直⻆会被渲染为圆⻆。</p>
+<p><img src="/images/graphics/font-rendering/sdf_corner.png" alt="SDF 问题"></p>
+<p>改进后的 MSDF 可以解决这个问题。<br>参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/398656596">Signed Distance Field与Multi-channel signed distance field</a></p>
+<h3 id="SDF-的其他应⽤"><a href="#SDF-的其他应⽤" class="headerlink" title="SDF 的其他应⽤"></a>SDF 的其他应⽤</h3><blockquote>
+<p>本小节图片来源于博文：<a target="_blank" rel="noopener" href="https://blog.csdn.net/llsansun/article/details/119546508">有号距离场(SDF)</a></p>
+</blockquote>
+<ul>
+<li><p>形变动画</p>
+<img src="/images/graphics/font-rendering/sdf_example_1.gif" width="256">
+上面的形变动画就是利用如下的 SDF 来实现的。
+<img src="/images/graphics/font-rendering/sdf_example_2.png" width="256"></li>
+<li><p>序列帧柔和过渡</p>
+<img src="/images/graphics/font-rendering/sdf_example_3.gif" width="256">
+上面的动画，利用 SDF 优化效果后效果如下：
+<img src="/images/graphics/font-rendering/sdf_example_4.gif" width="256"></li>
+<li><p>软阴影</p>
+<img src="/images/graphics/font-rendering/sdf_example_5.png" width="256"></li>
+<li><p>碰撞检测</p>
+</li>
+<li><p>Ray Marching</p>
+</li>
+</ul>
+<h2 id="OpenType-格式简介"><a href="#OpenType-格式简介" class="headerlink" title="OpenType 格式简介"></a>OpenType 格式简介</h2><p>解析⼯具：<a target="_blank" rel="noopener" href="https://photopea.github.io/Typr.js/">https://photopea.github.io/Typr.js/</a></p>
+<h3 id="TableDirectory"><a href="#TableDirectory" class="headerlink" title="TableDirectory"></a>TableDirectory</h3><img src="/images/graphics/font-rendering/table_directory.png" width="80%">
+
+<p>核⼼字段：</p>
+<ul>
+<li>numberTables 表⽰ TableRecord 总数</li>
+<li>tableRecords 数组记录所有 TableRecord 数据 </li>
+</ul>
+<h3 id="TableRecord"><a href="#TableRecord" class="headerlink" title="TableRecord"></a>TableRecord</h3><img src="/images/graphics/font-rendering/table_record.png" width="80%">
+
+<p>核⼼字段：</p>
+<ul>
+<li>tableTag，以 4 个 char 进⾏标识不同的表，例如 cmap / loca / glfy</li>
+<li>offset &amp; length </li>
+</ul>
+<h3 id="Tables"><a href="#Tables" class="headerlink" title="Tables"></a>Tables</h3><ul>
+<li><p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/typography/opentype/spec/maxp">maxp</a><br>maxp 中记录了各种数据的最⼤值，例如简单字形最多⼏个点等等。从表中的数据，可以计算得到解析这个字体最多需要多少内存。</p>
+<img src="/images/graphics/font-rendering/maxp.png" width="80%"></li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/typography/opentype/spec/head">head</a><br>字体基础 / 全局信息等，version、magicNumber 等</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/typography/opentype/spec/hhea">hhea</a><br>hhea 记录了⽔平排版信息</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/typography/opentype/spec/cmap">cmap</a><br>cmap 存储的是从字符「<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%A0%81%E4%BD%8D">码位 code point</a>」到 glyphId 的映射。当然 cmap 中不是简单的 map 映射表，相对复杂，不展开。<br>因同⼀个字符，在不同编码下的码位可能有差异，这点在 cmap 的映射中通过 platformID 和 encodingID 来 区分。 </p>
+</li>
+<li><p>loca<br>loca 中存储的是 offsets 数组，下标就是 glyphId，取出的 offset 是字形数据在 glyf 表中的位置。 </p>
+<img src="/images/graphics/font-rendering/loca.png" width="80%"></li>
+<li><p>glyf<br>glyf 中存储了所有的字形数据。<br/><strong>字形基本信息：</strong></p>
+<div style="display: flex; align-items: center">
+<img src="/images/graphics/font-rendering/glyf_1.png" width="35%" height="100%">
+<img src="/images/graphics/font-rendering/glyf_2.png" width="63%" height="100%">
+</div>
+numberOfContours 表⽰控制点数量。如果 numberOfContours 值为 -1，表⽰当前字形是复合字形，由其他字形组合⽽来。 
+对于 numberOfContours >= 0 的简单字形，包含以下数据： 
+<img src="/images/graphics/font-rendering/glyf_3.png" width="80%"></li>
+</ul>
+<h2 id="⽮量字体光栅化（CPU）"><a href="#⽮量字体光栅化（CPU）" class="headerlink" title="⽮量字体光栅化（CPU）"></a>⽮量字体光栅化（CPU）</h2><h3 id="glyph-字形轮廓"><a href="#glyph-字形轮廓" class="headerlink" title="glyph 字形轮廓"></a>glyph 字形轮廓</h3><ul>
+<li>通过 cmap 表，完成从 code point 到 glyphId 的映射</li>
+<li>通过 loca 表，完成从 glyphId 到字形 offset 的映射</li>
+<li>解析 glyf 表，结合 offset，得到字形数据</li>
+<li>解析字形数据，得到所有控制点信息，对于每个控制点，都有标记标明是在轮廓线上 in-curve / 线外 off-curve</li>
+</ul>
+<p>那么，有了控制点数据之后，就可以从控制点计算得到直线 / 贝塞尔曲线参数。这里的贝塞尔曲线都是二次贝塞尔曲线，因此需要 P0 / P1 / P2 三个点，其中 P1 是线外的控制点。</p>
+<p><strong>直线 / ⻉塞尔曲线参数解析逻辑：</strong><br>按顺序遍历控制点数据，假定 P 是上一个在线内的点。从数组中第一个线内的点开始，记为 P0，P1 和 P2 就是 P0 后面的点。</p>
+<ul>
+<li>如果 P1 在线内，那么 P0 和 P1 组成直线（下一个循环的 P0 为当前 P1）</li>
+<li>如果 P1在线外：<ul>
+<li>如果 P2 在线内，那么 P0 &amp; P1 &amp; P2 组成二次贝塞尔曲线，P1 为线外控制点（下一个循环的 P0 为当前 P2）</li>
+<li>如果 P2 在线外，说明是连续的⼆阶⻉塞尔曲线，P1 和 P2 分别是前后两个⼆次⻉塞尔曲线的控制点，P1 和 P2 的中点是线内的点。那么 P0 &amp; P1-P2 中点 &amp; P1 组成⼆次⻉塞尔曲线（下⼀个循环的 P0 为当前 P1-P2 中点，P1 为当前 P2）<img src="/images/graphics/font-rendering/bezier.png" width="300" height="100%"></li>
+</ul>
+</li>
+</ul>
+<p>到此，得到了直线、⼆阶⻉塞尔曲线的控制点。<br>这个时候如果把直线和⼆阶⻉塞尔曲线绘制出来，我们可以得到字形轮廓。</p>
+<div style="display: flex; align-items: center">
+  <img src="/images/graphics/font-rendering/outline_1.png" width="49%" height="100%">
+  <img src="/images/graphics/font-rendering/outline_2.png" width="49%" height="100%">
+</div>
+
+<p>如果需要渲染未填充的字形，那到这⾥就可以缓存起来⽅便之后使⽤了。<br>但往往还需要考虑如何填充颜⾊。填充算法：</p>
+<ul>
+<li>种⼦填充算法</li>
+<li>扫描线算法</li>
+</ul>
+<br/>
+
+<p>⾄此，我们知道了如何从 OpenType ⽮量字体中解析得到⽮量数据，并进⾏光栅化。但如果每次渲染字形都重新光栅化，性能往往⽐较差。并且，⼀个 App / 游戏⽤到的字都相对有限，因此我们可以考虑把光栅化后的字形进⾏缓存。</p>
+<blockquote>
+<p>OpenGL ⽂字渲染代码实现参考：<a target="_blank" rel="noopener" href="https://learnopengl-cn.readthedocs.io/zh/latest/06%20In%20Practice/02%20Text%20Rendering/">⽂字渲染</a></p>
+</blockquote>
+<h3 id="光栅化缓存"><a href="#光栅化缓存" class="headerlink" title="光栅化缓存"></a>光栅化缓存</h3><p>⼀般会创建⼀个固定⼤⼩的缓存纹理，例如 512 * 512，将光栅化好的字形绘制到纹理中，并记录字形到纹理坐标的映射。当缓存纹理空间不够时，则申请新的缓存纹理继续绘制。当然，也需要配合⼀定的 LRU 等缓存淘汰机制。 </p>
+<p>同时，如何最⼤化的利⽤缓存纹理的空间，也诞⽣了⼀些算法。（KeyWord：书架算法）<br>游戏中⼀般会采⽤「预置静态光栅化缓存」和「动态⽣成光栅化缓存」结合的⽅案。 </p>
+<h3 id="⽮量字体渲染（GPU）"><a href="#⽮量字体渲染（GPU）" class="headerlink" title="⽮量字体渲染（GPU）"></a>⽮量字体渲染（GPU）</h3><p><a target="_blank" rel="noopener" href="https://wdobbie.com/post/gpu-text-rendering-with-vector-textures/">GPU text rendering with vector textures</a>（<a target="_blank" rel="noopener" href="https://wdobbie.com/pdf/">DEMO</a>）<br><a target="_blank" rel="noopener" href="https://jcgt.org/published/0006/02/02/paper.pdf">Paper - GPU-Centered Font Rendering Directly from Glyph Outlines </a></p>
+<blockquote>
+<p>利⽤ GPU Compute Shader 进⾏实时⽮量渲染，虽然可⾏，但⽤的场景不多。<br>相⽐于光栅化结合⼀些 trade off 策略，⽮量渲染在效果上优势不⼤，性能也没有光栅化的⽅案好。 </p>
+</blockquote>
+<h3 id="常⻅字体渲染库"><a href="#常⻅字体渲染库" class="headerlink" title="常⻅字体渲染库"></a>常⻅字体渲染库</h3><ul>
+<li>FreeType：<a target="_blank" rel="noopener" href="https://freetype.org/">https://freetype.org/</a></li>
+<li>Cairo：<a target="_blank" rel="noopener" href="https://www.cairographics.org/">https://www.cairographics.org/</a></li>
+</ul>
+<blockquote>
+<p>更多字体相关库可以参考⽂章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/cpuimage/p/13337475.html">⽂字渲染⼀探</a></p>
+</blockquote>
+<h2 id="MORE"><a href="#MORE" class="headerlink" title="MORE"></a>MORE</h2><ul>
+<li>字体微调</li>
+<li>抗锯⻮</li>
+<li>排版</li>
+</ul>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/TrueType">TrueType</a><br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/FreeType">FreeType</a><br><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/typography/opentype/spec/">OpenType® Specification Version 1.9</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903745503887374">⽂字渲染的那些事（⼀）字体是如何存储的？</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/56171631">⽂字渲染那些事（⼆）⽂字的形状是怎么表⽰的？</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/yjr3426619/article/details/88597269">TrueType字体⽂件解析和字体光栅化</a><br><a target="_blank" rel="noopener" href="https://www.modb.pro/db/175187">TTF⾥都有什么</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/36553076">Korok字体系统设计</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cpuimage/p/13337475.html">⽂字渲染⼀探</a><br><a target="_blank" rel="noopener" href="https://viljamis.com/2016/typography-for-user-interfaces/">Typography for User Interfaces</a><br><a target="_blank" rel="noopener" href="https://zznewclear13.github.io/posts/calculate-signed-distance-field-using-compute-shader/">使⽤Compute Shader计算有向距离场</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/398656596">Signed Distance Field与Multi-channel signed distance field</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/llsansun/article/details/119546508">有号距离场(SDF)</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/65421383">在 WebGL 中渲染⽂字</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Jeffery Fan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://jefferyfan.github.io/graphics/font-rendering/" title="字体渲染概览">http://jefferyfan.github.io/graphics/font-rendering/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Graphics/" rel="tag"># Graphics</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/programing/iOS/non-fragile-ivar/" rel="prev" title="Objective-C 动态之 Non-fragile ivar">
+      <i class="fa fa-chevron-left"></i> Objective-C 动态之 Non-fragile ivar
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E2%BE%94"><span class="nav-number">1.</span> <span class="nav-text">前⾔</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E4%BD%93%E5%8F%91%E5%B1%95%E5%8E%86%E5%8F%B2"><span class="nav-number">2.</span> <span class="nav-text">字体发展历史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E4%BD%93%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">字体类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%82%B9%E9%98%B5%E5%AD%97%E4%BD%93-%E5%9B%BE%E9%9B%86%E5%AD%97%E4%BD%93"><span class="nav-number">3.1.</span> <span class="nav-text">点阵字体 &#x2F; 图集字体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%BD%AE%E9%87%8F%E5%AD%97%E4%BD%93"><span class="nav-number">3.2.</span> <span class="nav-text">⽮量字体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E9%98%B5-%E5%9B%BE%E9%9B%86%E5%AD%97%E4%BD%93%E6%B8%B2%E6%9F%93"><span class="nav-number">4.</span> <span class="nav-text">点阵 &#x2F; 图集字体渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%90%91%E8%B7%9D%E7%A6%BB%E5%9C%BA-SDF-Signed-Distance-Field"><span class="nav-number">4.1.</span> <span class="nav-text">有向距离场 SDF (Signed Distance Field)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SDF-%E7%9A%84%E9%97%AE%E9%A2%98%E4%BB%A5%E5%8F%8A-MSDF"><span class="nav-number">4.2.</span> <span class="nav-text">SDF 的问题以及 MSDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SDF-%E7%9A%84%E5%85%B6%E4%BB%96%E5%BA%94%E2%BD%A4"><span class="nav-number">4.3.</span> <span class="nav-text">SDF 的其他应⽤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenType-%E6%A0%BC%E5%BC%8F%E7%AE%80%E4%BB%8B"><span class="nav-number">5.</span> <span class="nav-text">OpenType 格式简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TableDirectory"><span class="nav-number">5.1.</span> <span class="nav-text">TableDirectory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TableRecord"><span class="nav-number">5.2.</span> <span class="nav-text">TableRecord</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tables"><span class="nav-number">5.3.</span> <span class="nav-text">Tables</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%BD%AE%E9%87%8F%E5%AD%97%E4%BD%93%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88CPU%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">⽮量字体光栅化（CPU）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#glyph-%E5%AD%97%E5%BD%A2%E8%BD%AE%E5%BB%93"><span class="nav-number">6.1.</span> <span class="nav-text">glyph 字形轮廓</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E6%A0%85%E5%8C%96%E7%BC%93%E5%AD%98"><span class="nav-number">6.2.</span> <span class="nav-text">光栅化缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%BD%AE%E9%87%8F%E5%AD%97%E4%BD%93%E6%B8%B2%E6%9F%93%EF%BC%88GPU%EF%BC%89"><span class="nav-number">6.3.</span> <span class="nav-text">⽮量字体渲染（GPU）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E2%BB%85%E5%AD%97%E4%BD%93%E6%B8%B2%E6%9F%93%E5%BA%93"><span class="nav-number">6.4.</span> <span class="nav-text">常⻅字体渲染库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MORE"><span class="nav-number">7.</span> <span class="nav-text">MORE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#References"><span class="nav-number">8.</span> <span class="nav-text">References</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jeffery Fan"
+      src="/images/portrait.jpg">
+  <p class="site-author-name" itemprop="name">Jeffery Fan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jefferyfan" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jefferyfan" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jefferyfan93@gmail.com" title="E-Mail → mailto:jefferyfan93@gmail.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jeffery Fan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"nLj8cRR6o6aa9DbLqyAwXk2k-gzGzoHsz","app_key":"h2V8q3Ga0czmbhLkB8CO4zzF","server_url":null,"security":false,"betterPerformance":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'nLj8cRR6o6aa9DbLqyAwXk2k-gzGzoHsz',
+      appKey     : 'h2V8q3Ga0czmbhLkB8CO4zzF',
+      placeholder: "Just Go Go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

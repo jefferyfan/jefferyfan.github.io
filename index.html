@@ -170,6 +170,106 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jefferyfan.github.io/graphics/font-rendering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/portrait.jpg">
+      <meta itemprop="name" content="Jeffery Fan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jeffery's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/graphics/font-rendering/" class="post-title-link" itemprop="url">字体渲染概览</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-16 20:44:13" itemprop="dateCreated datePublished" datetime="2022-08-16T20:44:13+08:00">2022-08-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Graphics/" itemprop="url" rel="index"><span itemprop="name">Graphics</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/graphics/font-rendering/" class="post-meta-item leancloud_visitors" data-flag-title="字体渲染概览" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="前⾔"><a href="#前⾔" class="headerlink" title="前⾔"></a>前⾔</h2><p>本⽂旨在介绍⽂字渲染需要了解的基本知识点，以及些许延伸扩展；不涉及到实际代码的编写，不涉及具体算法实现，但中间穿插引⽤的外部⽂档有部分代码实现可供参考。</p>
+<blockquote>
+<p>本文引用的图都是来源网络博文，部分图片并未记录来源。如涉及侵权请联系我。</p>
+</blockquote>
+<h2 id="字体发展历史"><a href="#字体发展历史" class="headerlink" title="字体发展历史"></a>字体发展历史</h2><ul>
+<li>在 Macintosh 电脑中，使用点阵字体（格式后缀：bdf、pcf、fnt、hbf等)。点阵字体放大后会出现锯齿、模糊的情况。</li>
+<li>在同一时期，Adobe 发明了基于 PostScript Type 1 的矢量字体格式，但 Type 1 字体是加密的，Adobe 通过售卖字体认证赚取利润，苹果也不得不向 Adobe 购买 Type 1 字体认证。</li>
+<li>于是，苹果决定设计全新的字体格式，最后在 1991 年发布为 TrueType 格式，同时也包括 Times Roman、Helvetica、Courier 等大量字体。</li>
+<li>但是 TrueType 字体反响并不好，因为大部分用户已经购买了 Adobe Type 1 字体，没必要再切换。因此，苹果联合微软对抗 Adobe，授权给微软使用 TrueType 字体。1991年，微软在 Windows 3.1 系统上支持了 TrueType，并和 MonoType 公司联合开发了大量著名字体，例如 Arial 等字体。</li>
+<li>1994 年，微软独自开发了 TrueType Open 字体；1996 年 Adobe 加入开发，兼容了 Type1 字体格式，更名为 OpenType。2007 年，OpenType 被国际标准组织 (ISO）采用。OpenType 常见后缀 otf、ttf、ttc。</li>
+<li>2023年，Adobe 将停止支持 Type 1 字体创作。</li>
+</ul>
+<br/>
+
+<blockquote>
+<p><strong>SFNT</strong>：SFNT 是苹果在开发 TrueType 字体格式时设计的通⽤字体数据存储结构，SFNT 是 spline font 或者 scalable font 的缩写，TrueType、OpenType、WOFF 等格式都采⽤ SFNT 作为容器。 </p>
+<p><strong>WOFF</strong>：Web Open Font Format，采⽤压缩格式，字体⽂件更⼩，适合⽹⻚使⽤。可以简单理解为 OpenType + 压缩。⼀般⽐ ttf 字体⼩ 40%。WOFF2 是 WOFF 的下⼀代标准，在 WOFF 的基础上提⾼ 30% 的 压缩率。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/graphics/font-rendering/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://jefferyfan.github.io/programing/iOS/non-fragile-ivar/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1013,92 +1113,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://jefferyfan.github.io/2017/04/10/programing/iOS/wkwebview-itunes/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/portrait.jpg">
-      <meta itemprop="name" content="Jeffery Fan">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jeffery's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2017/04/10/programing/iOS/wkwebview-itunes/" class="post-title-link" itemprop="url">使用WKWebView打开itunes链接无法跳转至AppStore</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2017-04-10 01:35:18" itemprop="dateCreated datePublished" datetime="2017-04-10T01:35:18+08:00">2017-04-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Programing/" itemprop="url" rel="index"><span itemprop="name">Programing</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Programing/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2017/04/10/programing/iOS/wkwebview-itunes/" class="post-meta-item leancloud_visitors" data-flag-title="使用WKWebView打开itunes链接无法跳转至AppStore" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在<code>UIWebView</code>上，不需要特殊处理直接加载 itunes 链接是可以直接跳转至AppStore的。</p>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSURL</span> *URL = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@&quot;https://itunes.apple.com/cn/app/id1013277346?mt=8&quot;</span>];</span><br><span class="line"><span class="built_in">NSURLRequest</span> *request = [<span class="built_in">NSURLRequest</span> requestWithURL:URL];</span><br><span class="line">    </span><br><span class="line"><span class="keyword">self</span>.webView = [<span class="built_in">UIWebView</span> new];</span><br><span class="line"><span class="keyword">self</span>.webView.delegate = <span class="keyword">self</span>;</span><br><span class="line">[<span class="keyword">self</span>.webView loadRequest:request];</span><br></pre></td></tr></table></figure>
-
-<p>但是，在WKWebView上则不行，需要在<code>navigationDelegate</code>中拦截，手动<code>openURL</code>才能跳转至AppStore。</p>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="type">void</span>)loadWithWKWebView</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSURL</span> *URL = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@&quot;https://itunes.apple.com/cn/app/id1013277346?mt=8&quot;</span>];</span><br><span class="line">    <span class="built_in">NSURLRequest</span> *request = [<span class="built_in">NSURLRequest</span> requestWithURL:URL];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.wkWebView = [<span class="built_in">WKWebView</span> new];</span><br><span class="line">    <span class="keyword">self</span>.wkWebView.navigationDelegate = <span class="keyword">self</span>;</span><br><span class="line">    [<span class="keyword">self</span>.wkWebView loadRequest:request];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)webView:(<span class="built_in">WKWebView</span> *)webView decidePolicyForNavigationAction:(<span class="built_in">WKNavigationAction</span> *)navigationAction decisionHandler:(<span class="type">void</span> (^)(<span class="built_in">WKNavigationActionPolicy</span>))decisionHandler</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">WKNavigationActionPolicy</span> policy = <span class="built_in">WKNavigationActionPolicyAllow</span>;</span><br><span class="line">    <span class="comment">/* 简单判断host，真实App代码中，需要更精确判断itunes链接 */</span></span><br><span class="line">    <span class="keyword">if</span> ([[navigationAction.request.URL host] isEqualToString:<span class="string">@&quot;itunes.apple.com&quot;</span>] &amp;&amp;</span><br><span class="line">        [[<span class="built_in">UIApplication</span> sharedApplication] openURL:navigationAction.request.URL])</span><br><span class="line">    &#123;</span><br><span class="line">        policy = <span class="built_in">WKNavigationActionPolicyCancel</span>;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    decisionHandler(policy);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>难以理解为啥WKWebView上不支持跳转至AppStore。<br>如果不处理，普通网页上链接至itunes的，点击后都无法跳转了。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1170,20 +1184,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
